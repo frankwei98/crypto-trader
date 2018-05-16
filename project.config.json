@@ -1,0 +1,13 @@
+{
+  "description": "You can Trade without any penny!",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram",
+  "appid": "wxb7b69927354beb45",
+  "projectname": "crypto-trader",
+  "miniprogramRoot": "./dist"
+}
