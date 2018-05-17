@@ -42,7 +42,7 @@
       <view class="weui-flex__item">
         <button class="weui-btn" type="primary" @tap="nextDay"> 买入 </button></view>
       <view class="weui-flex__item">
-      <button class="weui-btn" type="primary"> 观望 </button>
+      <button class="weui-btn" type="primary" @tap="nextDay"> 观望 </button>
       </view>
     </view>
   </view>
@@ -94,7 +94,11 @@ export default class Game extends wepy.page {
     nextDay() {
       const {renderChartData, chartsData} = this
       const element = chartsData.shift()
-      renderChartData.push(element)
+      if (element !== undefined) {
+        renderChartData.push(element)
+      } else {
+        console.warn('List is now empty')
+      }
     }
   };
 
