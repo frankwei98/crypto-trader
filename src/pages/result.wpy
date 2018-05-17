@@ -1,0 +1,116 @@
+<style lang="less">
+.title {
+    font-weight: 500;
+    font-size: 120rpx;
+}
+.echarts {
+  width: 750rpx;
+  height: 450rpx;
+}
+.stat {
+    align-items: center;
+}
+.win {
+    color: #f5222d
+}
+.lose {
+    color: #52c41a
+}
+</style>
+<template>
+  <view class="page">
+  <view class="echarts">
+          <candlestick />
+  </view>
+  <view class="stat">
+    <view class="title">
+        <!-- <view class="win" wx:if="{{isWin}}"> {{score}}% </view> -->
+        <view class="{{isWin ? 'win' : 'lose'}}"> {{score}}% </view> 
+    </view>
+    <view> 获得称号： 币圈李田所 </view>
+    <view> <button class="weui-btn" type="primary">继续梭哈</button> </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import Panel from '@/components/panel' // alias example
+import Candlestick from '@/components/candlestick' // alias example
+import Toast from 'wepy-com-toast'
+import testMixin from '../mixins/test'
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '币圈梭哈王'
+  };
+  components = {
+    panel: Panel,
+    toast: Toast,
+    candlestick: Candlestick
+  };
+
+  mixins = [testMixin];
+
+  data = {
+    mynum: 20,
+    userInfo: {},
+    score: 0,
+    netrst: ''
+  };
+
+  computed = {
+    now() {
+      return +new Date()
+    },
+    isWin() {
+      return this.score > 0
+    }
+  };
+
+  methods = {
+    plus() {
+      this.mynum++
+    },
+    toast() {
+      let promise = this.$invoke('toast', 'show', {
+        title: '自定义标题',
+        img:
+          'https://raw.githubusercontent.com/kiinlam/wetoast/master/images/star.png'
+      })
+
+      promise.then(d => {
+        console.log('toast done')
+      })
+    }
+  };
+
+  events = {
+    'index-emit': (...args) => {
+      let $event = args[args.length - 1]
+      console.log(
+        `${this.$name} receive ${$event.name} from ${$event.source.$name}`
+      )
+    }
+  };
+
+  onLoad({score}) {
+    let self = this
+    this.score = score
+    this.$parent.getUserInfo(function(userInfo) {
+      if (userInfo) {
+        this.userInfo = userInfo
+      }
+      self.normalTitle = '标题已被修改'
+
+      self.setTimeoutTitle = '标题三秒后会被修改'
+      setTimeout(() => {
+        self.setTimeoutTitle = '到三秒了'
+        self.$apply()
+      }, 3000)
+
+      self.$apply()
+    })
+  }
+}
+</script>
