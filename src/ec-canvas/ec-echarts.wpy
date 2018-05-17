@@ -5,7 +5,9 @@
 }
 </style>
 <template>
-<canvas class="ec-canvas" canvas-id="ec-canvas1"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+<canvas class="ec-canvas" canvas-id="ec-canvas1"
+ bindtouchstart="touchStart" bindtouchmove="touchMove"
+ bindtouchend="touchEnd">
 </canvas>
 </template>
 <script>

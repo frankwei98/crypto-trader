@@ -25,10 +25,6 @@
 <template>
   <view class="page">
     <view class="userinfo" @tap="handleViewTap">
-      <button class="zan-btn zan-btn--primary" 
-      type="primary" open-type="getUserInfo" 
-      bindgetuserinfo="bindGetUserInfo" 
-      wx:if="{{!userInfo.nickName}}">开启游戏</button>
       <navigator url="result?score=-1919" 
       hover-class="navigator-hover">跳转到新页面</navigator>
       <image class="userinfo-avatar" 
@@ -40,11 +36,11 @@
     <toast />
     <view class="echarts">
       <!-- <echarts :ec.sync="ec" :canvasId.sync="canvasId"/> -->
-      <candlestick />
+      <candlestick :chartData.sync="renderChartData"/>
     </view>
     <view class="weui-flex">
       <view class="weui-flex__item">
-        <button class="weui-btn" type="primary"> 买入 </button></view>
+        <button class="weui-btn" type="primary" @tap="nextDay"> 买入 </button></view>
       <view class="weui-flex__item">
       <button class="weui-btn" type="primary"> 观望 </button>
       </view>
@@ -59,7 +55,7 @@ import Candlestick from '@/components/candlestick' // alias example
 import Toast from 'wepy-com-toast'
 import testMixin from '../mixins/test'
 
-export default class Index extends wepy.page {
+export default class Game extends wepy.page {
   config = {
     navigationBarTitleText: '币圈梭哈王'
   };
@@ -75,6 +71,16 @@ export default class Index extends wepy.page {
     mynum: 20,
     userInfo: {},
     count: 0,
+    renderChartData: [],
+    chartsData: [
+      [100, 200, 40, 250],
+      [80, 90, 66, 100],
+      [90, 40, 33, 110],
+      [50, 60, 40, 80],
+      [200, 180, 160, 200],
+      [100, 200, 40, 250],
+      [80, 90, 66, 100]
+    ],
     netrst: ''
   };
 
@@ -85,31 +91,10 @@ export default class Index extends wepy.page {
   };
 
   methods = {
-    plus() {
-      this.mynum++
-    },
-    toast() {
-      let promise = this.$invoke('toast', 'show', {
-        title: '自定义标题',
-        img:
-          'https://raw.githubusercontent.com/kiinlam/wetoast/master/images/star.png'
-      })
-
-      promise.then(d => {
-        console.log('toast done')
-      })
-    },
-    bindGetUserInfo(userInfoObj) {
-      console.log(userInfoObj)
-      const { detail } = userInfoObj
-      const { userInfo } = detail
-      this.userInfo = userInfo
-    },
-    counterEmit(...args) {
-      let $event = args[args.length - 1]
-      console.log(
-        `${this.$name} receive ${$event.name} from ${$event.source.$name}`
-      )
+    nextDay() {
+      const {renderChartData, chartsData} = this
+      const element = chartsData.shift()
+      renderChartData.push(element)
     }
   };
 

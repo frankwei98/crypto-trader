@@ -1,13 +1,12 @@
 <style lang="less">
-
 .echarts {
   width: 750rpx;
   height: 900rpx;
 }
-
 </style>
 <template>
   <view class="container">
+    <view> {{str}} </view>
     <view class="echarts">
       <echarts :ec.sync="ec" :canvasId.sync="canvasId"/>
     </view>
@@ -17,13 +16,40 @@
 <script>
 import wepy from 'wepy'
 import Echarts from '../ec-canvas/ec-echarts'
+import getEcOption from './ecOption'
+export default class CandleStick extends wepy.component {
+  customData = {}; // 自定义数据
 
-export default class Index extends wepy.page {
-  config = {
-    navigationBarTitleText: '币圈梭哈王'
-  };
+  customFunction() {} // 自定义方法
+
+  onLoad() {
+    const {chartData} = this
+    console.log(chartData)
+    this.ec = getEcOption(chartData)
+  } // 在Page和Component共用的生命周期函数
+
+  onShow() {} // 只在Page中存在的页面生命周期函数
+
+  config = {}; // 只在Page实例中存在的配置数据，对应于原生的page.json文件
+
   components = {
     echarts: Echarts
+  }; // 声明页面中所引用的组件，或声明组件中所引用的子组件
+
+  mixins = []; // 声明页面所引用的Mixin实例
+
+  computed = {}; // 声明计算属性（详见后文介绍）
+
+  watch = {
+
+  }; // 声明数据watcher（详见后文介绍）
+
+  methods = {}; // 声明页面wxml中标签的事件处理函数。注意，此处只用于声明页面wxml中标签的bind、catch事件，自定义方法需以自定义方法的方式声明
+
+  events = {}; // 声明组件之间的事件处理函数
+
+  props = {
+    chartData: Array
   };
 
   data = {
@@ -43,15 +69,7 @@ export default class Index extends wepy.page {
         series: [
           {
             type: 'candlestick',
-            data: [
-              [100, 200, 40, 250],
-              [80, 90, 66, 100],
-              [90, 40, 33, 110],
-              [50, 60, 40, 80],
-              [200, 180, 160, 200],
-              [100, 200, 40, 250],
-              [80, 90, 66, 100]
-            ],
+            data: [],
             itemStyle: {
               normal: {
                 color: '#f5222d',
@@ -70,7 +88,5 @@ export default class Index extends wepy.page {
     counts: [],
     total: []
   };
-
-  methods = {}
 }
 </script>

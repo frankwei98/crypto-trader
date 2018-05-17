@@ -4,25 +4,27 @@
 <template>
   <view class="page">
     <view> 获得称号： 币圈李田所 </view>
-    <view> <button class="weui-btn" type="primary">授权登录</button> </view>
+    <view> 
+      <button class="weui-btn"
+      type="primary" open-type="getUserInfo" 
+      bindgetuserinfo="login" 
+      wx:if="{{!userInfo.nickName}}">开启游戏</button>
+      </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy'
 import Panel from '@/components/panel' // alias example
-import Candlestick from '@/components/candlestick' // alias example
 import Toast from 'wepy-com-toast'
 import testMixin from '../mixins/test'
-
 export default class Index extends wepy.page {
   config = {
     navigationBarTitleText: '币圈梭哈王'
   };
   components = {
     panel: Panel,
-    toast: Toast,
-    candlestick: Candlestick
+    toast: Toast
   };
 
   mixins = [testMixin];
@@ -44,20 +46,7 @@ export default class Index extends wepy.page {
   };
 
   methods = {
-    plus() {
-      this.mynum++
-    },
-    toast() {
-      let promise = this.$invoke('toast', 'show', {
-        title: '自定义标题',
-        img:
-          'https://raw.githubusercontent.com/kiinlam/wetoast/master/images/star.png'
-      })
 
-      promise.then(d => {
-        console.log('toast done')
-      })
-    }
   };
 
   events = {
@@ -68,7 +57,11 @@ export default class Index extends wepy.page {
       )
     }
   };
-
+  login({detail}) {
+    const { userInfo } = detail
+    this.userInfo = userInfo
+    wx.redirectTo({url: '/pages/game'})
+  }
   onLoad({score}) {
     let self = this
     this.score = score
