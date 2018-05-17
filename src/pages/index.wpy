@@ -1,43 +1,11 @@
 <style lang="less">
-.userinfo {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-}
 
-.userinfo-avatar {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-}
-
-.userinfo-nickname {
-  color: #aaa;
-}
-.echarts {
-  width: 750rpx;
-  height: 900rpx;
-}
 </style>
 <template>
-  <view class="container">
-    <view class="userinfo" @tap="handleViewTap">
-      <button class="zan-btn zan-btn--primary" 
-      type="primary" open-type="getUserInfo" 
-      bindgetuserinfo="bindGetUserInfo" 
-      wx:if="{{!userInfo.nickName}}">开启游戏</button>
-      <image class="userinfo-avatar" 
-      src="{{ userInfo.avatarUrl }}" background-size="cover"/>
-      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
-      <view> Day 1</view>
+  <view class="page">
+    <view> 获得称号： 币圈李田所 </view>
+    <view> <button class="weui-btn" type="primary">授权登录</button> </view>
     </view>
-
-    <toast />
-    <view class="echarts">
-      <!-- <echarts :ec.sync="ec" :canvasId.sync="canvasId"/> -->
-      <candlestick />
-    </view>
-    <!-- <view>{{ec.onInit}}</view> -->
   </view>
 </template>
 
@@ -47,7 +15,6 @@ import Panel from '@/components/panel' // alias example
 import Candlestick from '@/components/candlestick' // alias example
 import Toast from 'wepy-com-toast'
 import testMixin from '../mixins/test'
-// import Echarts from '../ec-canvas/ec-echarts'
 
 export default class Index extends wepy.page {
   config = {
@@ -64,13 +31,16 @@ export default class Index extends wepy.page {
   data = {
     mynum: 20,
     userInfo: {},
-    count: 0,
+    score: 0,
     netrst: ''
   };
 
   computed = {
     now() {
       return +new Date()
+    },
+    isWin() {
+      return this.score > 0
     }
   };
 
@@ -88,18 +58,6 @@ export default class Index extends wepy.page {
       promise.then(d => {
         console.log('toast done')
       })
-    },
-    bindGetUserInfo(userInfoObj) {
-      console.log(userInfoObj)
-      const { detail } = userInfoObj
-      const { userInfo } = detail
-      this.userInfo = userInfo
-    },
-    counterEmit(...args) {
-      let $event = args[args.length - 1]
-      console.log(
-        `${this.$name} receive ${$event.name} from ${$event.source.$name}`
-      )
     }
   };
 
@@ -112,8 +70,9 @@ export default class Index extends wepy.page {
     }
   };
 
-  onLoad() {
+  onLoad({score}) {
     let self = this
+    this.score = score
     this.$parent.getUserInfo(function(userInfo) {
       if (userInfo) {
         this.userInfo = userInfo
