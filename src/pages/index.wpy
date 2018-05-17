@@ -5,7 +5,6 @@
   <view class="page">
     <view> 获得称号： 币圈李田所 </view>
     <view> <button class="weui-btn" type="primary">授权登录</button> </view>
-    </view>
   </view>
 </template>
 
