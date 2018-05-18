@@ -24,23 +24,26 @@
 </style>
 <template>
   <view class="page">
-    <view class="userinfo" @tap="handleViewTap">
-      <navigator url="result?score=-1919" 
-      hover-class="navigator-hover">跳转到新页面</navigator>
-      <image class="userinfo-avatar" 
-      src="{{ userInfo.avatarUrl }}" background-size="cover"/>
-      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
-      <view> Day 1</view>
+    <view class="userinfo">
+      <view> Day {{dayCount}} 
+        资金: {{fund}} 
+        当前份额: {{qty}} 
+        市值: {{marketCap}} 
+        价格: {{currentPrice}}</view>
     </view>
 
     <toast />
     <view class="echarts">
-      <!-- <echarts :ec.sync="ec" :canvasId.sync="canvasId"/> -->
       <candlestick :chartData.sync="renderChartData"/>
     </view>
+
     <view class="weui-flex">
       <view class="weui-flex__item">
-        <button class="weui-btn" type="primary" @tap="nextDay"> 买入 </button></view>
+        <button class="weui-btn" 
+        type="primary" wx:if="{{!haveStock}}" @tap="buy"> 买入 </button>
+        <button class="weui-btn" 
+        type="danger" wx:if="{{haveStock}}" @tap="sell"> 卖出 </button>
+        </view>
       <view class="weui-flex__item">
       <button class="weui-btn" type="primary" @tap="nextDay"> 观望 </button>
       </view>
@@ -68,9 +71,11 @@ export default class Game extends wepy.page {
   mixins = [testMixin];
 
   data = {
-    mynum: 20,
     userInfo: {},
-    count: 0,
+    dayCount: 0,
+    fund: 10000,
+    qty: 0,
+    currentPrice: 0,
     renderChartData: [],
     chartsData: [
       [100, 200, 40, 250],
@@ -80,25 +85,32 @@ export default class Game extends wepy.page {
       [200, 180, 160, 200],
       [100, 200, 40, 250],
       [80, 90, 66, 100]
-    ],
-    netrst: ''
+    ]
   };
 
   computed = {
-    now() {
-      return +new Date()
+    marketCap() {
+      const {qty, currentPrice} = this
+      return qty * currentPrice
+    },
+    haveStock() {
+      const {qty} = this
+      return qty !== 0
     }
   };
 
   methods = {
-    nextDay() {
-      const {renderChartData, chartsData} = this
-      const element = chartsData.shift()
-      if (element !== undefined) {
-        renderChartData.push(element)
-      } else {
-        console.warn('List is now empty')
+    buy() {
+      if (this.renderChartData.length > 1) {
+        this.qty = this.fund / this.currentPrice
+        this.fund = 0
       }
+      this.nextDay()
+    },
+    sell() {
+      this.fund = this.marketCap
+      this.qty = 0
+      this.nextDay()
     }
   };
 
@@ -112,21 +124,43 @@ export default class Game extends wepy.page {
   };
 
   onLoad() {
-    let self = this
-    this.$parent.getUserInfo(function(userInfo) {
+    this.$parent.getUserInfo(userInfo => {
       if (userInfo) {
         this.userInfo = userInfo
       }
-      self.normalTitle = '标题已被修改'
-
-      self.setTimeoutTitle = '标题三秒后会被修改'
-      setTimeout(() => {
-        self.setTimeoutTitle = '到三秒了'
-        self.$apply()
-      }, 3000)
-
-      self.$apply()
     })
+    this.nextDay()
+  }
+  getAvg(element) {
+    const length = element.length
+    const sum = element.reduce((acc, cur) => acc + cur)
+    return sum / length
+  }
+  shiftElementToRender() {
+    const { renderChartData, chartsData } = this
+    const element = chartsData.shift()
+    if (element !== undefined) {
+      renderChartData.push(element)
+    }
+    return element
+  }
+  nextDay() {
+    const element = this.shiftElementToRender()
+    var {fund} = this
+    if (element !== undefined) {
+      this.currentPrice = this.getAvg(element)
+      this.dayCount += 1
+    } else {
+      console.warn('List is now empty')
+      if (this.haveStock) {
+        fund = this.marketCap
+        this.qty = 0
+      }
+      console.log(`${this.haveStock} - by the ending, user have ¥ ${fund} `)
+      const diff = Math.abs((fund - 10000))
+      const result = ((diff / 10000) * 100).toFixed(2)
+      wx.redirectTo({url: `/pages/result?score=${result}`})
+    }
   }
 }
 </script>

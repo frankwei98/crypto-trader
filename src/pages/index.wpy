@@ -3,7 +3,6 @@
 </style>
 <template>
   <view class="page">
-    <view> 获得称号： 币圈李田所 </view>
     <view> 
       <button class="weui-btn"
       type="primary" open-type="getUserInfo" 
@@ -32,17 +31,11 @@ export default class Index extends wepy.page {
   data = {
     mynum: 20,
     userInfo: {},
-    score: 0,
-    netrst: ''
+    score: 0
   };
 
   computed = {
-    now() {
-      return +new Date()
-    },
-    isWin() {
-      return this.score > 0
-    }
+
   };
 
   methods = {
