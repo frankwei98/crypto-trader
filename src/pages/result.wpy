@@ -28,7 +28,13 @@
         <view class="{{isWin ? 'win' : 'lose'}}"> {{score}}% </view> 
     </view>
     <view> 获得称号： 币圈李田所 </view>
-    <view> <button class="weui-btn" type="primary">继续梭哈</button> </view>
+    <view>
+      <navigator url="game" 
+      hover-class="navigator-hover">
+      <button class="weui-btn" type="primary">继续梭哈</button>
+      </navigator>
+     
+     </view>
     </view>
   </view>
 </template>
