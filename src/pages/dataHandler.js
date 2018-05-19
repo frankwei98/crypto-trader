@@ -8,8 +8,8 @@ export default class MarketDataHandler {
   get chartsData() {
     const {data} = this
     return data.map(
-            ({ open, high, close, low, percent, date }) =>
-              [date, open, high, close, low])
+            ({ open, high, close, low, volume }) =>
+              [open, high, close, low, volume])
   }
 
   get categoryData() {
@@ -19,7 +19,8 @@ export default class MarketDataHandler {
 
   get volumes() {
     const {data} = this
-    return data.map(({ open, close, volume }) => [
+    return data.map(({ open, close, volume }, idx) => [
+      idx,
       volume,
       open > close ? 1 : -1
     ])

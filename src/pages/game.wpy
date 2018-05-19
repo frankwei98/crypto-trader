@@ -78,7 +78,9 @@ export default class Game extends wepy.page {
     fund: 10000,
     qty: 0,
     currentPrice: 0,
-    renderChartData: [],
+    renderChartData: [['1970-01-01', 100, 200, 40, 250],
+      ['1970-01-01', 80, 90, 66, 100],
+      ['1970-01-01', 90, 40, 33, 110]],
     volumes: [],
     renderVolumesData: [],
     chartsData: [
