@@ -22,13 +22,31 @@ export default class CandleStick extends wepy.component {
 
   customFunction() {} // 自定义方法
 
-  onLoad() {
-    const {chartData} = this
-    console.log(chartData)
-    this.ec = getEcOption(chartData)
-  } // 在Page和Component共用的生命周期函数
+  props = {
+    chartData: {
+      type: Array,
+      default: []
+    },
+    volumes: {
+      type: Array,
+      default: []
+    },
+    category: {
+      type: Array,
+      default: []
+    }
+  };
 
-  onShow() {} // 只在Page中存在的页面生命周期函数
+  onLoad() {
+    // const {chartData, volumes, category} = this
+    // console.log(chartData)
+    // // Need to add `volume for getEcOption`
+    // const params = {chartData, volumes, categoryData: category}
+    // const econfig = getEcOption(params)
+    // console.log(econfig)
+    // this.ec = econfig
+    console.log(this.ec)
+  } // 在Page和Component共用的生命周期函数
 
   config = {}; // 只在Page实例中存在的配置数据，对应于原生的page.json文件
 
@@ -38,26 +56,112 @@ export default class CandleStick extends wepy.component {
 
   mixins = []; // 声明页面所引用的Mixin实例
 
-  computed = {}; // 声明计算属性（详见后文介绍）
+  computed = {
+    ec() {
+      const {chartData, volumes, category} = this
+      const params = {chartData, volumes, categoryData: category}
+      return getEcOption(params)
+    }
+  }; // 声明计算属性（详见后文介绍）
 
-  watch = {
+  watch = {}; // 声明数据watcher（详见后文介绍）
 
-  }; // 声明数据watcher（详见后文介绍）
+  methods = {
 
-  methods = {}; // 声明页面wxml中标签的事件处理函数。注意，此处只用于声明页面wxml中标签的bind、catch事件，自定义方法需以自定义方法的方式声明
+  }; // 声明页面wxml中标签的事件处理函数。注意，此处只用于声明页面wxml中标签的bind、catch事件，自定义方法需以自定义方法的方式声明
 
   events = {}; // 声明组件之间的事件处理函数
-
-  props = {
-    chartData: Array
-  };
 
   data = {
     mynum: 20,
     userInfo: {},
     count: 0,
     netrst: '',
-    ec: { },
+    // ec: {
+    //   option: {
+    //     grid: [
+    //       {
+    //         left: '10%',
+    //         right: '8%',
+    //         height: '50%'
+    //       },
+    //       {
+    //         left: '10%',
+    //         right: '8%',
+    //         top: '63%',
+    //         height: '10%'
+    //       }
+    //     ],
+    //     xAxis: [
+    //       {
+    //         type: 'category',
+    //         data: this.categoryData,
+    //         scale: true,
+    //         boundaryGap: false,
+    //         axisLine: { onZero: false },
+    //         splitLine: { show: false },
+    //         splitNumber: 20,
+    //         min: 'dataMin',
+    //         max: 'dataMax'
+    //       },
+    //       {
+    //         type: 'category',
+    //         gridIndex: 1,
+    //         data: this.categoryData,
+    //         scale: true,
+    //         boundaryGap: false,
+    //         axisLine: { onZero: false },
+    //         axisTick: { show: false },
+    //         splitLine: { show: false },
+    //         axisLabel: { show: false },
+    //         splitNumber: 20,
+    //         min: 'dataMin',
+    //         max: 'dataMax'
+    //       }
+    //     ],
+    //     yAxis: [
+    //       {
+    //         scale: true,
+    //         splitArea: {
+    //           show: false
+    //         }
+    //       },
+    //       {
+    //         scale: true,
+    //         gridIndex: 1,
+    //         splitNumber: 2,
+    //         axisLabel: { show: false },
+    //         axisLine: { show: false },
+    //         axisTick: { show: false },
+    //         splitLine: { show: false }
+    //       }
+    //     ],
+    //     series: [
+    //       {
+    //         name: 'Market',
+    //         type: 'candlestick',
+    //         data: this.chartData,
+    //         itemStyle: {
+    //           normal: {
+    //             color: '#f5222d',
+    //             color0: '#52c41a',
+    //             borderColor: '#ff4d4f',
+    //             borderColor0: '#73d13d',
+    //             borderWidth: 1,
+    //             opacity: 1
+    //           }
+    //         }
+    //       },
+    //       {
+    //         name: 'Volume',
+    //         type: 'bar',
+    //         xAxisIndex: 1,
+    //         yAxisIndex: 1,
+    //         data: this.volumes
+    //       }
+    //     ]
+    //   }
+    // },
     canvasId: 'canvasId2',
     counts: [],
     total: []

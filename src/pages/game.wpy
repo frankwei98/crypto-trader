@@ -26,15 +26,17 @@
   <view class="page">
     <view class="userinfo">
       <view> Day {{dayCount}} 
-        资金: {{fund}} 
-        当前份额: {{qty}} 
-        市值: {{marketCap}} 
-        价格: {{currentPrice}}</view>
+        <!-- 总资产: {{myWealth}}  -->
+        收益率: {{getProfitStat}} %
+        价格: {{fixedPrice}}</view>
     </view>
 
     <toast />
     <view class="echarts">
-      <candlestick :chartData.sync="renderChartData"/>
+      <candlestick 
+      :chartData.sync="renderChartData" 
+      :volumes.sync="renderVolumesData"
+      :category.sync="renderCategory"/>
     </view>
 
     <view class="weui-flex">
@@ -57,7 +59,7 @@ import Panel from '@/components/panel' // alias example
 import Candlestick from '@/components/candlestick' // alias example
 import Toast from 'wepy-com-toast'
 import testMixin from '../mixins/test'
-
+import MarketDataHandler from './dataHandler'
 export default class Game extends wepy.page {
   config = {
     navigationBarTitleText: '币圈梭哈王'
@@ -77,6 +79,8 @@ export default class Game extends wepy.page {
     qty: 0,
     currentPrice: 0,
     renderChartData: [],
+    volumes: [],
+    renderVolumesData: [],
     chartsData: [
       [100, 200, 40, 250],
       [80, 90, 66, 100],
@@ -85,26 +89,38 @@ export default class Game extends wepy.page {
       [200, 180, 160, 200],
       [100, 200, 40, 250],
       [80, 90, 66, 100]
-    ]
+    ],
+    renderCategory: []
   };
 
   computed = {
     marketCap() {
-      const {qty, currentPrice} = this
+      const { qty, currentPrice } = this
       return qty * currentPrice
     },
     haveStock() {
-      const {qty} = this
+      const { qty } = this
       return qty !== 0
+    },
+    myWealth() {
+      const {fund, marketCap} = this
+      return (fund + marketCap).toFixed(2)
+    },
+    fixedPrice() {
+      return this.currentPrice.toFixed(2)
+    },
+    getProfitStat() {
+      const {myWealth} = this
+      const diff = myWealth - 10000
+      return (diff / 10000 * 100).toFixed(2)
     }
   };
 
   methods = {
     buy() {
-      if (this.renderChartData.length > 1) {
-        this.qty = this.fund / this.currentPrice
-        this.fund = 0
-      }
+      const { fund, currentPrice } = this
+      this.qty = fund / currentPrice
+      this.fund = 0
       this.nextDay()
     },
     sell() {
@@ -123,43 +139,64 @@ export default class Game extends wepy.page {
     }
   };
 
-  onLoad() {
+  async onLoad() {
+    const { data, errMsg } = await wepy.request(
+      'https://api.xueqiu.com/ksoul/candidate/random'
+    )
+    console.log('We got response')
+    const sliceBefore = (array) => array.slice(0, array.length - 15)
+    const sliceNow = (array) => array.slice(-15)
+
+    if (errMsg === 'request:ok') {
+      console.log('Data loaded')
+      // const { name} = data
+      const dataHandler = new MarketDataHandler(data)
+      const { chartsData, volumes, categoryData } = dataHandler
+      // Candlestick Chart
+      this.renderChartData = sliceBefore(chartsData)
+      this.chartsData = sliceNow(chartsData)
+
+      // Volume Chart
+      this.renderVolumesData = sliceBefore(volumes)
+      this.volumes = sliceNow(volumes)
+
+      // Cat
+      this.renderCategory = categoryData
+    }
     this.$parent.getUserInfo(userInfo => {
       if (userInfo) {
         this.userInfo = userInfo
       }
     })
     this.nextDay()
+    this.$apply()
   }
   getAvg(element) {
-    const length = element.length
-    const sum = element.reduce((acc, cur) => acc + cur)
-    return sum / length
+    const sum = element[1] + element[2] + element[3] + element[4]
+    return sum / 4
   }
   shiftElementToRender() {
-    const { renderChartData, chartsData } = this
-    const element = chartsData.shift()
+    const { renderChartData, chartsData, volumes, renderVolumesData } = this
+    let element = chartsData.shift()
+    let vol = volumes.shift()
     if (element !== undefined) {
       renderChartData.push(element)
+      renderVolumesData.push(vol)
     }
+    console.log('shifted')
     return element
   }
   nextDay() {
+    console.log('start to shift')
     const element = this.shiftElementToRender()
-    var {fund} = this
+    console.log('shifted in nextDay fns')
     if (element !== undefined) {
+      console.log(this.currentPrice)
       this.currentPrice = this.getAvg(element)
       this.dayCount += 1
     } else {
-      console.warn('List is now empty')
-      if (this.haveStock) {
-        fund = this.marketCap
-        this.qty = 0
-      }
-      console.log(`${this.haveStock} - by the ending, user have ¥ ${fund} `)
-      const diff = Math.abs((fund - 10000))
-      const result = ((diff / 10000) * 100).toFixed(2)
-      wx.redirectTo({url: `/pages/result?score=${result}`})
+      const {getProfitStat} = this
+      wx.redirectTo({ url: `/pages/result?score=${getProfitStat}` })
     }
   }
 }

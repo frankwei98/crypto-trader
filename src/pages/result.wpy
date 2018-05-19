@@ -103,6 +103,7 @@ export default class Index extends wepy.page {
   onLoad({score}) {
     let self = this
     this.score = score
+    wx.setNavigationBarTitle({title: score > 0 ? '好耶 赚了' : '扎心了老铁'})
     this.$parent.getUserInfo(function(userInfo) {
       if (userInfo) {
         this.userInfo = userInfo
