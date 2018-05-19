@@ -38,6 +38,18 @@ export default function getEcOption({chartData, volumes, categoryData}) {
         height: '10%'
       }
     ],
+    visualMap: {
+      show: false,
+      seriesIndex: 5,
+      dimension: 2,
+      pieces: [{
+        value: 1,
+        color: '#52c41a'
+      }, {
+        value: -1,
+        color: '#f5222d'
+      }]
+    },
     xAxis: [
       {
         type: 'category',
@@ -61,8 +73,8 @@ export default function getEcOption({chartData, volumes, categoryData}) {
         splitLine: {show: false},
         axisLabel: {show: false},
         splitNumber: 20,
-        min: 'dataMin',
-        max: 'dataMax'
+        min: 'dataMin'
+        // max: 'dataMax'
       }],
     yAxis: [
       {
@@ -81,7 +93,16 @@ export default function getEcOption({chartData, volumes, categoryData}) {
         splitLine: {show: false}
       }
     ],
-    series
+    series,
+    animation: false,
+    dataZoom: [
+      {
+        type: 'inside',
+        filterMode: 'empty',
+        start: 75,
+        end: 100
+      }
+    ]
   }
   console.log(option)
   return {option}
